@@ -1,10 +1,10 @@
 package ZMQ::FFI::ErrorHelper;
 
-use Moo;
-use namespace::autoclean;
-
 use Carp;
 use FFI::Raw;
+
+use Moo;
+use namespace::clean;
 
 has soname => (
     is       => 'ro',
@@ -47,6 +47,22 @@ sub fatal {
     my $strerr = $ffi->{zmq_strerror}->($errno);
 
     confess "$func: $strerr";
+}
+
+sub bad_version {
+    my ($self, $msg, $use_carp) = @_;
+
+    my $verstr = join ".", zmq_version($self->soname);
+
+    if ($use_carp) {
+        croak   "$msg\n"
+              . "your version: $verstr";
+    }
+    else {
+        die   "$msg\n"
+            . "your version: $verstr";
+
+    }
 }
 
 sub _init_err_ffi {
