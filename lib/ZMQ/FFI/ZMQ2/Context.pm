@@ -11,21 +11,24 @@ use namespace::clean;
 with qw(
     ZMQ::FFI::ContextRole
     ZMQ::FFI::ErrorHandler
-    ZMQ::FFI::Versioner
 );
 
 has '+threads' => (
     default => 1,
 );
 
+my $FFI_LOADED;
+
 sub BUILD {
     my ($self) = @_;
 
-    _load_ffi($self->soname);
+    unless ($FFI_LOADED) {
+        _load_zmq2_ffi($self->soname);
+        $FFI_LOADED = 1;
+    }
 
     if ($self->has_max_sockets) {
-        die "max_sockets option not available for ZMQ2\n".
-            $self->_verstr;
+        $self->bad_version("max_sockets option not available in zmq 2.x")
     }
 
     try {
@@ -41,17 +44,19 @@ sub BUILD {
 sub get {
     my ($self = @_);
 
-    croak
-        "getting ctx options not implemented for ZMQ2\n".
-        $self->_verstr;
+    $self->bad_version(
+        "getting ctx options not available in zmq 2.x",
+        "use_carp"
+    );
 }
 
 sub set {
     my ($self = @_);
 
-    croak
-        "setting ctx options not implemented for ZMQ2\n".
-        $self->_verstr;
+    $self->bad_version(
+        "setting ctx options not available in zmq 2.x",
+        "use_carp"
+    );
 }
 
 sub socket {
@@ -70,7 +75,12 @@ sub socket {
 sub proxy {
     my ($self, $frontend, $backend, $capture) = @_;
 
-    croak "zeromq v2 does not support a capture socket" if defined $capture;
+    if ($capture){
+        $self->bad_version(
+            "capture socket not supported in zmq 2.x",
+            "use_carp"
+        );
+    }
 
     $self->check_error(
         'zmq_device',
@@ -98,16 +108,9 @@ sub destroy {
     $self->_ctx(-1);
 }
 
-sub _verstr {
-    my ($self = @_);
-    return "your version: ".$self->verstr;
-}
-
-sub _load_ffi {
+sub _load_zmq2_ffi {
     my ($soname) = @_;
 
-    state $ffi;
-    return if $ffi;
     $ffi = FFI::Platypus->new( lib => $soname );
 
     $ffi->attach(
