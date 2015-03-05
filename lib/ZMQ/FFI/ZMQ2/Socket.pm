@@ -5,6 +5,7 @@ use FFI::Platypus::Buffer;
 use FFI::Platypus::Memory qw(malloc free memcpy);
 use ZMQ::FFI::Constants qw(:all);
 use Carp;
+use Try::Tiny;
 
 use Moo;
 use namespace::clean;
@@ -29,14 +30,20 @@ sub BUILD {
         $FFI_LOADED = 1;
     }
 
-}
+    try {
+        my $s = zmq_socket($self->ctx->_ctx, $self->type);
+        $self->_socket($s);
+        $self->check_null('zmq_socket', $self->_socket);
+    }
+    catch {
+        $self->_socket(-1);
+        die $_;
+    };
 
-sub _build_socket {
-    my ($self) = @_;
-
-    my $socket = zmq_socket($self->ctx->_ctx, $self->type);
-    $self->check_null('zmq_socket', $socket);
-    return $socket;
+    # ensure clean edge state
+    while ( $self->has_pollin ) {
+        $self->recv();
+    }
 }
 
 sub connect {
