@@ -1,9 +1,10 @@
 package ZMQ::FFI::ZMQ2::Context;
 
-use strict;
-use warnings;
-
+use FFI::Platypus;
 use ZMQ::FFI::Util qw(zmq_soname);
+use ZMQ::FFI::Constants qw(ZMQ_STREAMER);
+use ZMQ::FFI::ZMQ2::Socket;
+use Try::Tiny;
 
 use Moo;
 use namespace::clean;
@@ -42,7 +43,7 @@ sub BUILD {
 }
 
 sub get {
-    my ($self = @_);
+    my ($self) = @_;
 
     $self->bad_version(
         "getting ctx options not available in zmq 2.x",
@@ -51,7 +52,7 @@ sub get {
 }
 
 sub set {
-    my ($self = @_);
+    my ($self) = @_;
 
     $self->bad_version(
         "setting ctx options not available in zmq 2.x",
@@ -84,7 +85,7 @@ sub proxy {
 
     $self->check_error(
         'zmq_device',
-        zmq_device(ZMQ_STREAMER, $frontend->_socket, $backend->_socket);
+        zmq_device(ZMQ_STREAMER, $frontend->_socket, $backend->_socket)
     );
 }
 
@@ -93,7 +94,7 @@ sub device {
 
     $self->check_error(
         'zmq_device',
-        zmq_device($type, $frontend->_socket, $backend->_socket);
+        zmq_device($type, $frontend->_socket, $backend->_socket)
     );
 }
 
@@ -111,7 +112,7 @@ sub destroy {
 sub _load_zmq2_ffi {
     my ($soname) = @_;
 
-    $ffi = FFI::Platypus->new( lib => $soname );
+    my $ffi = FFI::Platypus->new( lib => $soname );
 
     $ffi->attach(
         'zmq_init' => ['int'] => 'pointer'

@@ -17,6 +17,8 @@ sub version {
 }
 
 sub verstr {
+    my ($self) = @_;
+
     return join('.', $self->version);
 }
 
