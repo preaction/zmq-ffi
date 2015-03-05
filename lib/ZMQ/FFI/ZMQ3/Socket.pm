@@ -1,4 +1,4 @@
-package ZMQ::FFI::ZMQ2::Socket;
+package ZMQ::FFI::ZMQ3::Socket;
 
 use FFI::Platypus;
 use FFI::Platypus::Buffer;

@@ -43,6 +43,24 @@ sub BUILD {
     };
 }
 
+sub _load_zmq2_ffi {
+    my ($soname) = @_;
+
+    my $ffi = FFI::Platypus->new( lib => $soname );
+
+    $ffi->attach(
+        'zmq_init' => ['int'] => 'pointer'
+    );
+
+    $ffi->attach(
+        'zmq_device' => ['int', 'pointer', 'pointer'] => 'int'
+    );
+
+    $ffi->attach(
+        'zmq_term' => ['pointer'] => 'int'
+    );
+}
+
 sub get {
     my ($self) = @_;
 
@@ -108,24 +126,6 @@ sub destroy {
     );
 
     $self->_ctx(-1);
-}
-
-sub _load_zmq2_ffi {
-    my ($soname) = @_;
-
-    my $ffi = FFI::Platypus->new( lib => $soname );
-
-    $ffi->attach(
-        'zmq_init' => ['int'] => 'pointer'
-    );
-
-    $ffi->attach(
-        'zmq_device' => ['int', 'pointer', 'pointer'] => 'int'
-    );
-
-    $ffi->attach(
-        'zmq_term' => ['pointer'] => 'int'
-    );
 }
 
 sub DEMOLISH {
