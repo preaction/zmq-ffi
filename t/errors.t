@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-use FFI::Raw;
+use FFI::Platypus;
 use Errno qw(EINVAL);
 
 use ZMQ::FFI;
