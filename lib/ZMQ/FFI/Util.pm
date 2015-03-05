@@ -64,18 +64,23 @@ sub zmq_soname {
 }
 
 sub zmq_version {
-    my $soname = shift;
+    my ($soname) = @_;
 
     $soname //= zmq_soname();
 
     return unless $soname;
 
-    my $ffi = FFI::Platypus->new( lib => $soname );
+    my $ffi = FFI::Platypus->new( lib => $soname, ignore_not_found => 1 );
     my $zmq_version = $ffi->function(
         'zmq_version',
         ['int*', 'int*', 'int*'],
         'void'
     );
+
+    unless (defined $zmq_version) {
+        croak   "Could not find zmq_version in '$soname'\n"
+              . "Is '$soname' on your loader path?";
+    }
 
     my ($major, $minor, $patch);
     $zmq_version->call(\$major, \$minor, \$patch);
