@@ -250,7 +250,7 @@ sub get {
     my $optval_len;
 
     for ($opt_type) {
-        when (/^(binary|string)$/) {
+        when (/^binary$/) {
             my $optval_ptr = malloc(256);
             $optval_len    = 256;
 
@@ -265,6 +265,27 @@ sub get {
             );
 
             $optval = buffer_to_scalar($optval_ptr, $optval_len);
+            free($optval_ptr);
+        }
+
+        when (/^string$/) {
+            my $optval_ptr = malloc(256);
+            $optval_len    = 256;
+
+            $self->check_error(
+                'zmq_getsockopt',
+                zmq_getsockopt_binary(
+                    $self->_socket,
+                    $opt,
+                    $optval_ptr,
+                    \$optval_len
+                )
+            );
+
+            # FFI::Platypus already appends a null terminating byte
+            # So strip then one included by zeromq (otherwise test
+            # comparisons fail due to the extra NUL
+            $optval = buffer_to_scalar($optval_ptr, $optval_len-1);
             free($optval_ptr);
         }
 
