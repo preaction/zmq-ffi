@@ -62,6 +62,17 @@ sub _build_socket {
     return $socket;
 }
 
+my $FFI_LOADED;
+
+before BUILD => sub {
+    my ($self) = @_;
+
+    unless ($FFI_LOADED) {
+        _load_common_ffi($self->soname);
+        $FFI_LOADED = 1;
+    }
+}
+
 sub connect {
     my ($self, $endpoints) = @_;
 
@@ -298,6 +309,17 @@ sub set {
     return;
 }
 
+sub close {
+    my $self = shift;
+
+    $self->check_error(
+        'zmq_close',
+        zmq_close($self->_socket)
+    );
+
+    $self->_socket(-1);
+}
+
 sub _load_common_ffi {
     my ($soname) = @_;
 
@@ -379,5 +401,14 @@ sub _load_common_ffi {
         'zmq_close' => ['pointer'] => 'int'
     );
 }
+
+sub DEMOLISH {
+    my $self = shift;
+
+    unless ($self->_socket == -1) {
+        $self->close();
+    }
+}
+
 
 1;

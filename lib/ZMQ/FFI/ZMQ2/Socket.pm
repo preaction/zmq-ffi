@@ -5,6 +5,7 @@ use warnings;
 
 use ZMQ::FFI::Common;
 use FFI::Platypus;
+use FFI::Platypus::Buffer;
 
 use Moo;
 use namespace::clean;
@@ -20,7 +21,6 @@ sub BUILD {
     my ($self) = @_;
 
     unless ($FFI_LOADED) {
-        _load_common_ffi($self->soname);
         _load_zmq2_ffi($self->soname);
         $FFI_LOADED = 1;
     }
@@ -28,12 +28,68 @@ sub BUILD {
 }
 
 sub send {
-    # 0: self
-    # 1: msg
-    # 2: flags
+    my ($self, $msg, $flags) = @_;
 
-    
+    $flags //= 0;
+
+    my $msg_size;
+    {
+        use bytes;
+        $msg_size = length($msg);
+    };
+
+    my $msg_ptr = malloc(zmq_msg_t_size);
+
+    $self->check_error(
+        'zmq_msg_init_size',
+        zmq_msg_init_size($msg_ptr, $msg_size)
+    );
+
+    my $msg_data_ptr = zmq_msg_data($msg_ptr);
+
+    $self->check_error(
+        'zmq_send',
+        zmq_send($self->_socket, $msg_ptr, $flags)
+    );
+
+    zmq_msg_close($msg_ptr);
 }
+
+sub recv {
+    my ($self, $flags) = @_;
+
+    $flags //= 0;
+
+    my $msg_ptr = malloc(zmq_msg_t_size);
+
+    $self->check_error(
+        'zmq_msg_init',
+        zmq_msg_init($msg_ptr)
+    );
+
+    $self->check_error(
+        'zmq_recv',
+        zmq_recv($self->_socket, $msg_ptr, $flags)
+    );
+
+    my $data_ptr = zmq_msg_data($msg_ptr);
+
+    my $msg_size = zmq_msg_size($msg_ptr);
+    $self->check_error('zmq_msg_size', $msg_size);
+
+    my $rv;
+    if ($msg_size) {
+        $rv = buffer_to_scalar($data_ptr, $msg_size);
+    }
+    else {
+        $rv = '';
+    }
+
+    zmq_msg_close($msg_ptr);
+
+    return $rv;
+}
+
 
 sub disconnect {
     my ($self) = @_;
