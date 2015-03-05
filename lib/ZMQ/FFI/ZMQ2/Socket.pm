@@ -162,7 +162,7 @@ sub get {
 
             $self->check_error(
                 'zmq_getsockopt',
-                zmq_getsockopt_string(
+                zmq_getsockopt_binary(
                     $self->_socket,
                     $opt,
                     $optval_ptr,
@@ -218,6 +218,7 @@ sub get {
         }
     }
 
+    return unless $optval;
     return $optval;
 }
 
@@ -226,13 +227,14 @@ sub set {
 
     for ($opt_type) {
         when (/^(binary|string)$/) {
+            my ($optval_ptr, $optval_len) = scalar_to_buffer($optval);
             $self->check_error(
                 'zmq_setsockopt',
-                zmq_setsockopt_string(
+                zmq_setsockopt_binary(
                     $self->_socket,
                     $opt,
-                    $optval,
-                    length($optval)
+                    $optval_ptr,
+                    $optval_len
                 )
             );
         }
@@ -244,7 +246,7 @@ sub set {
                     $self->_socket,
                     $opt,
                     \$optval,
-                    sizeof('int')
+                    FFI::Platypus->new()->sizeof('int')
                 )
             );
         }
@@ -256,7 +258,7 @@ sub set {
                     $self->_socket,
                     $opt,
                     \$optval,
-                    sizeof('sint64')
+                    FFI::Platypus->new()->sizeof('sint64')
                 )
             );
         }
@@ -268,7 +270,7 @@ sub set {
                     $self->_socket,
                     $opt,
                     \$optval,
-                    sizeof('uint64')
+                    FFI::Platypus->new()->sizeof('uint64')
                 )
             );
         }

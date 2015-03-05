@@ -67,8 +67,8 @@ sub _load_common_ffi {
     );
 
     $ffi->attach(
-        ['zmq_getsockopt' => "${class}::zmq_getsockopt_string"],
-            => ['pointer', 'int', 'string', 'size_t*'] => 'int'
+        ['zmq_getsockopt' => "${class}::zmq_getsockopt_binary"],
+            => ['pointer', 'int', 'pointer', 'size_t*'] => 'int'
     );
 
     $ffi->attach(
@@ -87,8 +87,8 @@ sub _load_common_ffi {
     );
 
     $ffi->attach(
-        ['zmq_setsockopt' => "${class}::zmq_setsockopt_string"],
-            => ['pointer', 'int', 'string', 'size_t'] => 'int'
+        ['zmq_setsockopt' => "${class}::zmq_setsockopt_binary"],
+            => ['pointer', 'int', 'pointer', 'size_t'] => 'int'
     );
 
     $ffi->attach(
