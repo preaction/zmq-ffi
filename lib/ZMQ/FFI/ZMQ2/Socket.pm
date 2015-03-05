@@ -158,6 +158,7 @@ sub get {
     for ($opt_type) {
         when (/^(binary|string)$/) {
             my $optval_ptr = malloc(256);
+            $optval_len    = 256;
 
             $self->check_error(
                 'zmq_getsockopt',
@@ -174,6 +175,7 @@ sub get {
         }
 
         when (/^int$/) {
+            $optval_len = FFI::Platypus->new()->sizeof('int');
             $self->check_error(
                 'zmq_getsockopt',
                 zmq_getsockopt_int(
@@ -199,6 +201,7 @@ sub get {
         }
 
         when (/^uint64_t$/) {
+            $optval_len = FFI::Platypus->new()->sizeof('uint64');
             $self->check_error(
                 'zmq_getsockopt',
                 zmq_getsockopt_uint64(
