@@ -334,14 +334,14 @@ sub recv {
         zmq_recv($self->_socket, $msg_ptr, $flags)
     );
 
-    my $data_ptr = zmq_msg_data($msg_ptr);
+    my $data_ptr  = zmq_msg_data($msg_ptr);
+    my $data_size = zmq_msg_size($msg_ptr);
 
-    my $msg_size = zmq_msg_size($msg_ptr);
-    $self->check_error('zmq_msg_size', $msg_size);
+    $self->check_error('zmq_msg_size', $data_size);
 
     my $rv;
-    if ($msg_size) {
-        $rv = buffer_to_scalar($data_ptr, $msg_size);
+    if ($data_size) {
+        $rv = buffer_to_scalar($data_ptr, $data_size);
     }
     else {
         $rv = '';
