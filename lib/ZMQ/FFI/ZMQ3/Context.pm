@@ -26,7 +26,8 @@ sub BUILD {
     }
 
     try {
-        $self->_ctx( zmq_ctx_new() );
+        my $c = zmq_ctx_new();
+        $self->_ctx($c);
         $self->check_null('zmq_ctx_new', $self->_ctx);
     }
     catch {
@@ -49,7 +50,7 @@ sub _load_zmq3_ffi {
     my $ffi = FFI::Platypus->new( lib => $soname );
 
     $ffi->attach(
-        'zmq_ctx_new' => ['pointer'] => 'void'
+        'zmq_ctx_new' => [] => 'pointer'
     );
 
     $ffi->attach(
@@ -130,63 +131,5 @@ sub destroy {
 
     $self->_ctx(-1);
 };
-
-
-1;
-__END__
-
-sub _init_ffi {
-    my $self = shift;
-
-    my $ffi    = {};
-    my $soname = $self->soname;
-
-    $ffi->{zmq_ctx_new} = FFI::Raw->new(
-        $soname => 'zmq_ctx_new',
-        FFI::Raw::ptr, # returns ctx ptr
-        # void
-    );
-
-    $ffi->{zmq_ctx_set} = FFI::Raw->new(
-        $soname => 'zmq_ctx_set',
-        FFI::Raw::int, # error code,
-        FFI::Raw::ptr, # ctx
-        FFI::Raw::int, # opt constant
-        FFI::Raw::int  # opt value
-    );
-
-    $ffi->{zmq_ctx_get} = FFI::Raw->new(
-        $soname => 'zmq_ctx_get',
-        FFI::Raw::int, # opt value,
-        FFI::Raw::ptr, # ctx
-        FFI::Raw::int  # opt constant
-    );
-
-    $ffi->{zmq_proxy} = FFI::Raw->new(
-        $soname => 'zmq_proxy',
-        FFI::Raw::int, # error code
-        FFI::Raw::ptr, # frontend
-        FFI::Raw::ptr, # backend
-        FFI::Raw::ptr, # captuer
-    );
-
-    $ffi->{zmq_device} = FFI::Raw->new(
-        $soname => 'zmq_device',
-        FFI::Raw::int, # error code
-        FFI::Raw::int, # type
-        FFI::Raw::ptr, # frontend
-        FFI::Raw::ptr, # backend
-    );
-
-    $ffi->{zmq_ctx_destroy} = FFI::Raw->new(
-        $soname => 'zmq_ctx_destroy',
-        FFI::Raw::int, # retval
-        FFI::Raw::ptr  # ctx to destroy
-    );
-
-    return $ffi;
-}
-
-__PACKAGE__->meta->make_immutable();
 
 1;
