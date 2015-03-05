@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/calid/zmq-ffi.png?branch=master)](https://travis-ci.org/calid/zmq-ffi)
 
-##  Perl zeromq bindings using libffi and [FFI::Raw](https://github.com/ghedo/p5-FFI-Raw) ##
+##  Perl zeromq bindings using libffi and [FFI::Platypus](https://github.com/plicease/FFI-Platypus) ##
 
 ZMQ::FFI exposes a high level, transparent, OO interface to zeromq independent of the underlying libzmq version.  Where semantics differ, it will dispatch to the appropriate backend for you.  As it uses ffi, there is no dependency on XS or compilation.
 
