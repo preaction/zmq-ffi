@@ -128,4 +128,12 @@ sub _load_zmq2_ffi {
     );
 }
 
+sub DEMOLISH {
+    my $self = shift;
+
+    unless ($self->_ctx == -1) {
+        $self->destroy();
+    }
+}
+
 1;

@@ -23,10 +23,10 @@ sub new {
         require ZMQ::FFI::ZMQ2::Context;
         return ZMQ::FFI::ZMQ2::Context->new(%args);
     }
-    else {
-        require ZMQ::FFI::ZMQ3::Context;
-        return ZMQ::FFI::ZMQ3::Context->new(%args);
-    }
+    # else {
+    #     require ZMQ::FFI::ZMQ3::Context;
+    #     return ZMQ::FFI::ZMQ3::Context->new(%args);
+    # }
 };
 
 1;
