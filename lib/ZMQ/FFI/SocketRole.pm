@@ -238,6 +238,66 @@ sub get {
     return $optval;
 }
 
+sub set {
+    my ($self, $opt, $opt_type, $opt_val) = @_;
+
+    for ($opt_type) {
+        when (/^(binary|string)$/) {
+            $self->check_error(
+                'zmq_setsockopt',
+                zmq_setsockopt_string(
+                    $self->_socket,
+                    $opt,
+                    $optval_val,
+                    length($optval_len)
+                )
+            );
+        }
+
+        when (/^int$/) {
+            $self->check_error(
+                'zmq_setsockopt',
+                zmq_setsockopt_int(
+                    $self->_socket,
+                    $opt,
+                    \$optval,
+                    sizeof('int')
+                )
+            );
+        }
+
+        when (/^int64_t$/) {
+            $self->check_error(
+                'zmq_setsockopt',
+                zmq_setsockopt_int64(
+                    $self->_socket,
+                    $opt,
+                    \$optval,
+                    sizeof('sint64')
+                )
+            );
+        }
+
+        when (/^uint64_t$/) {
+            $self->check_error(
+                'zmq_setsockopt',
+                zmq_setsockopt_uint64(
+                    $self->_socket,
+                    $opt,
+                    \$optval,
+                    sizeof('uint64')
+                )
+            );
+        }
+
+        default {
+            croak "unknown type $opt_type";
+        }
+    }
+
+    return;
+}
+
 sub _load_common_ffi {
     my ($soname) = @_;
 
@@ -268,7 +328,23 @@ sub _load_common_ffi {
     );
 
     $ffi->attach(
-        'zmq_setsockopt' => ['pointer', 'int', 'pointer', 'int'] => 'int'
+        'zmq_setsockopt_string'
+            => ['pointer', 'int', 'string', 'size_t'] => 'int'
+    );
+
+    $ffi->attach(
+        'zmq_setsockopt_int'
+            => ['pointer', 'int', 'int*', 'size_t'] => 'int'
+    );
+
+    $ffi->attach(
+        'zmq_setsockopt_int64'
+            => ['pointer', 'int', 'sint64*', 'size_t'] => 'int'
+    );
+
+    $ffi->attach(
+        'zmq_setsockopt_uint64'
+            => ['pointer', 'int', 'uint64*', 'size_t'] => 'int'
     );
 
     $ffi->attach(
