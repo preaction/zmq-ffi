@@ -2,7 +2,7 @@ package ZMQ::FFI::ZMQ2::Socket;
 
 use FFI::Platypus;
 use FFI::Platypus::Buffer;
-use FFI::Platypus::Memory qw(malloc free);
+use FFI::Platypus::Memory qw(malloc free memcpy);
 use ZMQ::FFI::Constants qw(:all);
 use Carp;
 
@@ -288,24 +288,26 @@ sub close {
 }
 
 sub send {
-    my ($self, $msg, $flags) = @_;
+    my ($self, $data, $flags) = @_;
 
     $flags //= 0;
 
-    my $msg_size;
+    my $data_ptr;
+    my $data_size;
     {
         use bytes;
-        $msg_size = length($msg);
+        ($data_ptr, $data_size) = scalar_to_buffer($data);
     };
 
     my $msg_ptr = malloc(zmq_msg_t_size);
 
     $self->check_error(
         'zmq_msg_init_size',
-        zmq_msg_init_size($msg_ptr, $msg_size)
+        zmq_msg_init_size($msg_ptr, $data_size)
     );
 
     my $msg_data_ptr = zmq_msg_data($msg_ptr);
+    memcpy($msg_data_ptr, $data_ptr, $data_size);
 
     $self->check_error(
         'zmq_send',
