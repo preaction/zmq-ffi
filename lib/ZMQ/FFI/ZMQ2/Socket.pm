@@ -218,7 +218,7 @@ sub get {
         }
     }
 
-    return unless $optval;
+    return if $optval eq '';
     return $optval;
 }
 
