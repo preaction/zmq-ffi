@@ -15,6 +15,7 @@ use feature 'switch';
 with qw(
     ZMQ::FFI::SocketRole
     ZMQ::FFI::ErrorHandler
+    ZMQ::FFI::Versioner
 );
 
 my $FFI_LOADED;
@@ -185,6 +186,7 @@ sub get {
         }
 
         when (/^int64_t$/) {
+            $optval_len = FFI::Platypus->new()->sizeof('sint64');
             $self->check_error(
                 'zmq_getsockopt',
                 zmq_getsockopt_int64(
