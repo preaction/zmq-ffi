@@ -12,6 +12,7 @@ use namespace::clean;
 with qw(
     ZMQ::FFI::ContextRole
     ZMQ::FFI::ErrorHandler
+    ZMQ::FFI::Versioner
 );
 
 has '+threads' => (

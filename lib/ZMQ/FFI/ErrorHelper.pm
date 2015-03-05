@@ -2,6 +2,7 @@ package ZMQ::FFI::ErrorHelper;
 
 use Carp;
 use FFI::Raw;
+use ZMQ::FFI::Util q(zmq_version);
 
 use Moo;
 use namespace::clean;
