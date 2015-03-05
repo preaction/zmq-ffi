@@ -129,7 +129,7 @@ sub destroy {
 }
 
 sub DEMOLISH {
-    my $self = shift;
+    my ($self) = @_;
 
     unless ($self->_ctx == -1) {
         $self->destroy();

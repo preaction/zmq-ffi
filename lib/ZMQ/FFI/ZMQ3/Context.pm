@@ -132,4 +132,12 @@ sub destroy {
     $self->_ctx(-1);
 };
 
+sub DEMOLISH {
+    my ($self) = @_;
+
+    unless ($self->_ctx == -1) {
+        $self->destroy();
+    }
+}
+
 1;

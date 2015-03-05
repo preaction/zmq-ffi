@@ -114,7 +114,7 @@ sub disconnect {
 
     $self->check_error(
         'zmq_disconnect',
-        $self->_zmq3_ffi->{zmq_disconnect}->($self->_socket, $endpoint)
+        zmq_disconnect($self->_socket, $endpoint)
     );
 }
 
@@ -127,7 +127,7 @@ sub unbind {
 
     $self->check_error(
         'zmq_unbind',
-        $self->_zmq3_ffi->{zmq_unbind}->($self->_socket, $endpoint)
+        zmq_unbind($self->_socket, $endpoint)
     );
 }
 
