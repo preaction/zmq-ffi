@@ -81,10 +81,10 @@ sub send {
 
     my $data_ptr;
     my $data_size;
-    {
-        use bytes;
-        ($data_ptr, $data_size) = scalar_to_buffer($_[1]);
-    };
+
+    use bytes;
+    ($data_ptr, $data_size) = scalar_to_buffer($_[1]);
+    no bytes;
 
     my $msg_ptr = malloc(zmq_msg_t_size);
 
