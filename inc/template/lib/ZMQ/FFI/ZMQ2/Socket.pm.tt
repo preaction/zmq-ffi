@@ -37,7 +37,7 @@ sub BUILD {
     try {
         # XXX
         # not clear why this is necessary, but the setter doesn't actually
-        # take affect if you directly nest the zmq_socket call in the _scoket
+        # take affect if you directly nest the zmq_socket call in the _socket
         # call... some Class::XSAccessor weirdness/bug? Need to investigate.
         my $s = zmq_socket($self->ctx->_ctx, $self->type);
         $self->_socket($s);
@@ -83,7 +83,7 @@ sub send {
     my $data_size;
     {
         use bytes;
-        ($data_ptr, $data_size) = ;
+        ($data_ptr, $data_size) = scalar_to_buffer($_[1]);
     };
 
     my $msg_ptr = malloc(zmq_msg_t_size);
@@ -95,7 +95,7 @@ sub send {
     my $msg_data_ptr = zmq_msg_data($msg_ptr);
     memcpy($msg_data_ptr, $data_ptr, $data_size);
 
-    if ( -1 == zmq_send($_[0]->_socket, $msg_ptr, $_[2]) ) {
+    if ( -1 == zmq_send($_[0]->_socket, $msg_ptr, $_[2] // 0) ) {
         $_[0]->fatal('zmq_send');
     }
 
@@ -112,7 +112,7 @@ sub recv {
         $_[0]->fatal('zmq_msg_init');
     }
 
-    if ( -1 == zmq_recv($self->_socket, $msg_ptr, $flags) ) {
+    if ( -1 == zmq_recv($_[0]->_socket, $msg_ptr, $_[1] // 0) ) {
         $_[0]->fatal('zmq_recv');
     }
 

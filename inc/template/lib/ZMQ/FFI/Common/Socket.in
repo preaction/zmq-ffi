@@ -28,41 +28,38 @@ sub bind {
 }
 
 sub send_multipart {
-    my ($self, $partsref, $flags) = @_;
+    # 0: self
+    # 1: partsref
+    # 2: flags
 
-    my @parts = @{$partsref // []};
+    my @parts = @{$_[1] // []};
     unless (@parts) {
         croak 'usage: send_multipart($parts, $flags)';
     }
 
-    $flags //= 0;
-
     for my $i (0..$#parts-1) {
-        $self->send($parts[$i], $flags | ZMQ_SNDMORE);
+        $_[0]->send($parts[$i], ($_[2] // 0) | ZMQ_SNDMORE);
     }
 
-    $self->send($parts[$#parts], $flags);
+    $_[0]->send($parts[$#parts], $_[2] // 0);
 }
 
 sub recv_multipart {
-    my ($self, $flags) = @_;
+    # 0: self
+    # 1: flags
 
-    my @parts = ( $self->recv($flags) );
+    my @parts = ( $_[0]->recv($_[1]) );
+    my $type  = ($_[0]->version)[0] == 2 ? 'int64_t' : 'int';
 
-    my ($major) = $self->version;
-    my $type    = $major == 2 ? 'int64_t' : 'int';
-
-    while ( $self->get(ZMQ_RCVMORE, $type) ){
-        push @parts, $self->recv($flags);
+    while ( $_[0]->get(ZMQ_RCVMORE, $type) ){
+        push @parts, $_[0]->recv($_[1] // 0);
     }
 
     return @parts;
 }
 
 sub get_fd {
-    my $self = shift;
-
-    return $self->get(ZMQ_FD, 'int');
+    return $_[0]->get(ZMQ_FD, 'int');
 }
 
 sub set_linger {
