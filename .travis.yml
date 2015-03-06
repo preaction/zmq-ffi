@@ -27,4 +27,6 @@ before_script:
         | awk '{ print $1 }'
         | cpanm --notest || /bin/true
 
+    - perl scripts/gen_modules.pl
+
 script: xt/test_versions.sh
