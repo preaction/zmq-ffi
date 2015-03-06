@@ -17,7 +17,7 @@ my @templates = (
 my $common_ffi = file('inc/template/lib/ZMQ/FFI/Common/Socket.in');
 
 my $vars = {
-    date           => scalar localtime,
+    date           => split("\n", scalar(qx{date -u})),
     zmq_common_api => scalar $common_ffi->slurp()
 };
 
