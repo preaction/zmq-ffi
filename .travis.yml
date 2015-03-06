@@ -12,7 +12,7 @@ before_install:
     - sudo apt-get -y remove libzmq*
 
 install:
-    - cpanm --notest Perl::PrereqScanner
+    - cpanm --notest Perl::PrereqScanner Template::Tiny Path::Class
 
 before_script:
     - >-
