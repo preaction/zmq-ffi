@@ -69,7 +69,7 @@ sub set_linger {
 }
 
 sub get_linger {
-    return shift->get(ZMQ_LINGER, 'int');
+    return $_[0]->get(ZMQ_LINGER, 'int');
 }
 
 sub set_identity {
@@ -79,7 +79,7 @@ sub set_identity {
 }
 
 sub get_identity {
-    return shift->get(ZMQ_IDENTITY, 'binary');
+    return $_[0]->get(ZMQ_IDENTITY, 'binary');
 }
 
 sub subscribe {
@@ -95,17 +95,11 @@ sub unsubscribe {
 }
 
 sub has_pollin {
-    my $self = shift;
-
-    my $zmq_events = $self->get(ZMQ_EVENTS, 'int');
-    return $zmq_events & ZMQ_POLLIN;
+    return $_[0]->get(ZMQ_EVENTS, 'int') & ZMQ_POLLIN;
 }
 
 sub has_pollout {
-    my $self = shift;
-
-    my $zmq_events = $self->get(ZMQ_EVENTS, 'int');
-    return $zmq_events & ZMQ_POLLOUT;
+    return $_[0]->get(ZMQ_EVENTS, 'int') & ZMQ_POLLOUT;
 }
 
 sub get {
@@ -264,7 +258,7 @@ sub set {
 }
 
 sub close {
-    my $self = shift;
+    my ($self) = @_;
 
     $self->check_error(
         'zmq_close',
