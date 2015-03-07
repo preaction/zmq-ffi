@@ -206,7 +206,12 @@ or compilation.
 
 =head2 new([threads, max_sockets, soname])
 
+    ZMQ::FFI->new()
+
     ZMQ::FFI->new( threads => 42, max_sockets => 42 )
+
+    ZMQ::FFI->new( soname => '/path/to/libzmq.so' )
+    ZMQ::FFI->new( soname => 'libzmq.so.3' )
 
 returns a new context object, appropriate for the version of
 libzmq found on your system. It accepts the following optional attributes:
@@ -255,19 +260,23 @@ I<requires zmq E<gt>= 3.x>
 
 set a context option value
 
-=head2 socket($type)
+=head2 $socket = socket($type)
 
     $ctx->socket(ZMQ_REQ)
 
 returns a socket of the specified type. See L<SOCKET API> below
 
-=head2 proxy($frontend, $backend, $capture)
+=head2 proxy($frontend, $backend, [$capture])
 
-sets up and runs a zmq_proxy, C<$capture> is optional
+sets up and runs a C<zmq_proxy>. For zmq 2.x this will use a C<ZMQ_STREAMER>
+device to simulate the proxy. The optional C<$capture> is only supported for
+zmq E<gt>= 3.x however
 
 =head2 device($type, $frontend, $backend)
 
-sets up and runs a zmq_device with specified frontend and backend sockets
+I<zmq 2.x only>
+
+sets up and runs a C<zmq_device> with specified frontend and backend sockets
 
 =head2 destroy()
 
@@ -333,6 +342,8 @@ remove C<$topic> from the subscription list
 
     $socket->send('ohhai')
 
+    $socket->send('ohhai', ZMQ_DONTWAIT)
+
 sends a message using the optional flags
 
 =head2 send_multipart($parts_aref, [$flags])
@@ -342,9 +353,13 @@ sends a message using the optional flags
 given an array ref of message parts, sends the multipart message using the
 optional flags. ZMQ_SNDMORE semantics are handled for you
 
-=head2 recv([$flags])
+=head2 $msg = recv([$flags])
 
-receive a message
+    $socket->recv()
+
+    $socket->recv(ZMQ_DONTWAIT)
+
+receives a message using the optional flags
 
 =head2 @parts = recv_multipart([$flags])
 
@@ -356,7 +371,7 @@ semantics are handled for you
 checks ZMQ_EVENTS for ZMQ_POLLIN and ZMQ_POLLOUT respectively, and returns
 true/false depending on the state
 
-=head2 get($option, $option_type)
+=head2 $value = get($option, $option_type)
 
     $socket->get(ZMQ_LINGER, 'int')
 
