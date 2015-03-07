@@ -57,7 +57,7 @@ sub zmq_soname {
         croak
             qq(Could not load libzmq, tried:\n),
             join(', ', @sonames),"\n",
-            q(Is libzmq on your ld path?);
+            q(Is libzmq on your loader path?);
     }
 
     return $soname;
