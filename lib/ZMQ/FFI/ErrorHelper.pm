@@ -18,6 +18,16 @@ has _err_ffi => (
     builder => '_init_err_ffi',
 );
 
+sub BUILD {
+    # force init err ffi
+    # need to be sure ffi is loaded before zmq error functions are called,
+    # as on OS X errno can get clobbered if ffi is loaded just in time
+
+    # initializing in BUILD instead of lazy => 0, as we still need to be sure
+    # to initialize ffi after soname is set
+    $_[0]->_err_ffi;
+}
+
 sub check_error {
     my ($self, $func, $rc) = @_;
 

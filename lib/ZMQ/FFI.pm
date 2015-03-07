@@ -10,9 +10,9 @@ sub new {
 
     $args{soname} //= zmq_soname( die => 1 );
 
-    # explicitly passing in a loaded error helper instance
-    # (i.e. zmq error bindings) guards against the OS X loader clobbering errno,
-    # which can happen if the bindings are loaded lazily
+    # explicitly passing in a loaded error helper instance (i.e. zmq error
+    # bindings) guards against the OS X loader clobbering errno, which can
+    # happen if the bindings are loaded lazily
     $args{error_helper} =
         ZMQ::FFI::ErrorHelper->new( soname => $args{soname} );
 

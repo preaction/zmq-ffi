@@ -71,7 +71,7 @@ sub _load_zmq2_ffi {
 }
 
 #
-# send & recv are hot spots, so we're trading readability for performance
+# send/recv are hot spots, so sacrificing some readability for performance
 #
 
 sub send {
