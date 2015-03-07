@@ -5,14 +5,21 @@ package ZMQ::FFI;
 use strict;
 use warnings;
 
-use ZMQ::FFI::Util qw(zmq_soname zmq_version);
+use ZMQ::FFI::Util qw(zmq_soname zmq_version valid_soname);
 use ZMQ::FFI::ErrorHelper;
 use Carp;
 
 sub new {
     my ($self, %args) = @_;
 
-    $args{soname} //= zmq_soname( die => 1 );
+    if ($args{soname}) {
+        unless ( valid_soname($args{soname}) ) {
+            die "Failed to load '$args{soname}', is it on your loader path?";
+        }
+    }
+    else {
+        $args{soname} = zmq_soname( die => 1 );
+    }
 
     # explicitly passing in a loaded error helper instance (i.e. zmq error
     # bindings) guards against the OS X loader clobbering errno, which can

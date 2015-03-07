@@ -12,6 +12,7 @@ use Sub::Exporter -setup => {
     exports => [qw(
         zmq_soname
         zmq_version
+        valid_soname
     )],
 };
 
@@ -39,14 +40,7 @@ sub zmq_soname {
     for (@sonames) {
         $soname = $_;
 
-        my $ffi = FFI::Platypus->new( lib => $soname, ignore_not_found => 1 );
-        my $zmq_version = $ffi->function(
-            'zmq_version',
-            ['int*', 'int*', 'int*'],
-            'void'
-        );
-
-        unless (defined $zmq_version) {
+        unless ( valid_soname($soname) ) {
             undef $soname;
         }
 
@@ -86,6 +80,19 @@ sub zmq_version {
     $zmq_version->call(\$major, \$minor, \$patch);
 
     return $major, $minor, $patch;
+}
+
+sub valid_soname {
+    my ($soname) = @_;
+
+    my $ffi = FFI::Platypus->new( lib => $soname, ignore_not_found => 1 );
+    my $zmq_version = $ffi->function(
+        'zmq_version',
+        ['int*', 'int*', 'int*'],
+        'void'
+    );
+
+    return defined $zmq_version;
 }
 
 1;
