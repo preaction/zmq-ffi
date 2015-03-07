@@ -1,5 +1,9 @@
 package ZMQ::FFI;
+
 # ABSTRACT: zeromq bindings using FFI::Platypus and libffi
+
+use strict;
+use warnings;
 
 use ZMQ::FFI::Util qw(zmq_soname zmq_version);
 use ZMQ::FFI::ErrorHelper;
