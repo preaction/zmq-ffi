@@ -150,7 +150,7 @@ sub get {
         }
 
         when (/^int$/) {
-            $optval_len = FFI::Platypus->new()->sizeof('int');
+            $optval_len = $self->sockopt_sizes->{'int'};
             $self->check_error(
                 'zmq_getsockopt',
                 zmq_getsockopt_int(
@@ -163,7 +163,7 @@ sub get {
         }
 
         when (/^int64_t$/) {
-            $optval_len = FFI::Platypus->new()->sizeof('sint64');
+            $optval_len = $self->sockopt_sizes->{'sint64'};
             $self->check_error(
                 'zmq_getsockopt',
                 zmq_getsockopt_int64(
@@ -176,7 +176,7 @@ sub get {
         }
 
         when (/^uint64_t$/) {
-            $optval_len = FFI::Platypus->new()->sizeof('uint64');
+            $optval_len = $self->sockopt_sizes->{'uint64'};
             $self->check_error(
                 'zmq_getsockopt',
                 zmq_getsockopt_uint64(
@@ -221,7 +221,7 @@ sub set {
                     $self->_socket,
                     $opt,
                     \$optval,
-                    FFI::Platypus->new()->sizeof('int')
+                    $self->sockopt_sizes->{'int'}
                 )
             );
         }
@@ -233,7 +233,7 @@ sub set {
                     $self->_socket,
                     $opt,
                     \$optval,
-                    FFI::Platypus->new()->sizeof('sint64')
+                    $self->sockopt_sizes->{'sint64'}
                 )
             );
         }
@@ -245,7 +245,7 @@ sub set {
                     $self->_socket,
                     $opt,
                     \$optval,
-                    FFI::Platypus->new()->sizeof('uint64')
+                    $self->sockopt_sizes->{'uint64'}
                 )
             );
         }
