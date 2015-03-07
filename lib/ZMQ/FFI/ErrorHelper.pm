@@ -45,18 +45,15 @@ sub check_null {
 }
 
 sub bad_version {
-    my ($self, $msg, $use_carp) = @_;
+    my ($self, $verstr, $msg, $use_die) = @_;
 
-    my $verstr = join ".", zmq_version($self->soname);
-
-    if ($use_carp) {
-        croak   "$msg\n"
-              . "your version: $verstr";
-    }
-    else {
+    if ($use_die) {
         die   "$msg\n"
             . "your version: $verstr";
-
+    }
+    else {
+        croak   "$msg\n"
+              . "your version: $verstr";
     }
 }
 

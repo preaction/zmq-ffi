@@ -136,13 +136,19 @@ sub recv {
 sub disconnect {
     my ($self) = @_;
 
-    $self->bad_version("disconnect not available in zmq 2.x");
+    $self->bad_version(
+        $self->verstr,
+        "disconnect not available in zmq 2.x"
+    );
 }
 
 sub unbind {
     my ($self) = @_;
 
-    $self->bad_version("unbind not available in zmq 2.x");
+    $self->bad_version(
+        $self->verstr,
+        "unbind not available in zmq 2.x"
+    );
 }
 
 [% zmq_common_api %]
